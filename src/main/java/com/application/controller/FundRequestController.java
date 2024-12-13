@@ -9,53 +9,50 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.application.dto.BloodRequestDTO;
-import com.application.model.BloodRequest;
-import com.application.service.BloodRequestService;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
-import java.util.Map;
+import com.application.dto.FundRequestDTO;
+import com.application.model.FundRequest;
+import com.application.service.FundRequestService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/blood-request")
-public class BloodRequestController {
+@RequestMapping("/api/fund-request")
+public class FundRequestController {
     @Autowired
-    private BloodRequestService bloodRequestService;
+    private FundRequestService fundRequestService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createBloodRequest(@RequestBody Map<String, Object> requestBody) {
+    public ResponseEntity<?> createFundRequest(@RequestBody Map<String, Object> requestBody) {
         try {
-            // Create BloodRequest object from request body
-            BloodRequest bloodRequest = new BloodRequest();
-            bloodRequest.setUnits(Double.valueOf(requestBody.get("units").toString()));
-            bloodRequest.setBloodGroup(requestBody.get("blood_group").toString());
-            bloodRequest.setPatientName(requestBody.get("patient_name").toString());
+            // Create FundRequest object from request body
+            FundRequest fundRequest = new FundRequest();
+            fundRequest.setAmount(Double.valueOf(requestBody.get("amount").toString()));
+            fundRequest.setPatientName(requestBody.get("patient_name").toString());
             
-            // Parse require before time
-            String requireBeforeStr = requestBody.get("require_before").toString();
-            bloodRequest.setRequireBefore(LocalDateTime.parse(requireBeforeStr));
+            // Optional description
+            if (requestBody.containsKey("description")) {
+                fundRequest.setDescription(requestBody.get("description").toString());
+            }
 
             // Extract user and doctor IDs
             Long userId = Long.valueOf(requestBody.get("user_id").toString());
             Long doctorId = Long.valueOf(requestBody.get("doctor_id").toString());
 
-            BloodRequest savedRequest = bloodRequestService.createBloodRequest(bloodRequest, userId, doctorId);
+            FundRequest savedRequest = fundRequestService.createFundRequest(fundRequest, userId, doctorId);
             return ResponseEntity.ok(savedRequest);
-        } catch (IllegalArgumentException | DateTimeParseException e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @GetMapping("/list")
-    public ResponseEntity<?> listBloodRequests(
+    public ResponseEntity<?> listFundRequests(
         @RequestParam(required = false) Long userId
     ) {
         try {
             if (userId != null) {
-                List<BloodRequestDTO> requests = bloodRequestService.getBloodRequestsByUserId(userId);
+                List<FundRequestDTO> requests = fundRequestService.getFundRequestsByUserId(userId);
                 return ResponseEntity.ok(requests);
             } else {
                 // If no user_id is provided, you might want to return all requests or return an error
