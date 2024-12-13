@@ -84,4 +84,8 @@ public class UserService {
 		return userRepository.findProfileByEmail(email);
 	}
 
+    public List<User> getDoctors() {
+        return userRepository.findByRole("DOCTOR");
+    }
+
 }

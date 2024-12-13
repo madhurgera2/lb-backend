@@ -21,14 +21,14 @@ public class UserProfileDTO {
     private int age;
     private String role;
 
-    public UserProfileDTO(User currentUser) {
-        this.id = currentUser.getId();
-        this.email = currentUser.getEmail();
-        this.username = currentUser.getUsername();
-        this.mobile = currentUser.getMobile();
-        this.bloodgroup = currentUser.getBloodgroup();
-        this.gender = currentUser.getGender();
-        this.age = currentUser.getAge();
-        this.role = currentUser.getRole();
+    public UserProfileDTO(User user) {
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.username = user.getUsername();
+        this.mobile = user.getMobile();
+        this.bloodgroup = user.getBloodgroup();
+        this.gender = user.getGender();
+        this.age = user.getAge();
+        this.role = user.getRole();
     }
 }

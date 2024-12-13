@@ -34,6 +34,8 @@ import com.application.util.JwtUtils;
 
 import com.application.dto.UserProfileDTO;
 
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -173,5 +175,19 @@ public class UserController {
 		}
 
 		return ResponseEntity.ok(new UserProfileDTO(currentUser));
+	}
+
+	@GetMapping("/listDoctors")
+	public ResponseEntity<?> getDoctors() {
+		List<User> doctors = userService.getDoctors();
+		if (doctors.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No doctors found");
+		}
+
+		List<UserProfileDTO> doctorProfiles = doctors.stream()
+			.map(UserProfileDTO::new)
+			.collect(Collectors.toList());
+
+		return ResponseEntity.ok(doctorProfiles);
 	}
 }
