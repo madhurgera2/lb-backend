@@ -5,9 +5,13 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +31,8 @@ import com.application.model.JwtResponse;
 import com.application.model.User;
 import com.application.service.UserService;
 import com.application.util.JwtUtils;
+
+import com.application.dto.UserProfileDTO;
 
 @RestController
 @RequestMapping("/api/user")
@@ -149,5 +155,23 @@ public class UserController {
 	public ResponseEntity<Integer> getTotalUsers() {
 		int totalUsers = userService.getAllUsers().size();
 		return ResponseEntity.ok(totalUsers);
+	}
+
+	@GetMapping("/currentUser")
+	public ResponseEntity<?> getCurrentUserProfile() {
+		Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String username;
+		if (principal instanceof UserDetails) {
+			username = ((UserDetails) principal).getUsername();
+		} else {
+			username = principal.toString();
+		}
+
+		User currentUser = userService.fetchUserByEmail(username);
+		if (currentUser == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+		}
+
+		return ResponseEntity.ok(new UserProfileDTO(currentUser));
 	}
 }
