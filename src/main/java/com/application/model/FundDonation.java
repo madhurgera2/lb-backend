@@ -48,7 +48,7 @@ public class FundDonation {
     private Double amount;
 
     @Column(columnDefinition = "VARCHAR(20) DEFAULT 'PENDING'")
-    private String status = "PENDING";
+    private String status = "SUCCESS";
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

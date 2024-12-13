@@ -12,6 +12,7 @@ import java.util.List;
 
 public class FundRequestSpecification {
     public static Specification<FundRequest> filterFundRequests(
+        Long id,
         Long userId, 
         String status, 
         Double minAmount, 
@@ -29,6 +30,11 @@ public class FundRequestSpecification {
             // Status filter
             if (status != null && !status.isEmpty()) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
+
+            // Status filter
+            if (id != null) {
+                predicates.add(criteriaBuilder.equal(root.get("id"), id));
             }
 
             // Amount range filter

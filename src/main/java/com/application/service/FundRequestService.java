@@ -26,6 +26,7 @@ public class FundRequestService {
 
     @Transactional(readOnly = true)
     public List<FundRequestDTO> searchFundRequests(
+        Long id,
         Long userId, 
         String status, 
         Double minAmount, 
@@ -33,7 +34,7 @@ public class FundRequestService {
     ) {
         // Create specification based on filters
         Specification<FundRequest> spec = FundRequestSpecification.filterFundRequests(
-            userId, status, minAmount, maxAmount
+            id, userId, status, minAmount, maxAmount
         );
 
         // Find fund requests matching the specification and map to DTO
@@ -78,8 +79,13 @@ public class FundRequestService {
         dto.setId(fundRequest.getId());
         dto.setAmount(fundRequest.getAmount());
         dto.setPatientName(fundRequest.getPatientName());
+        dto.setDescription(fundRequest.getDescription());
         dto.setStatus(fundRequest.getStatus());
         dto.setCreatedAt(fundRequest.getCreatedAt());
+
+        // Calculate amount raised
+        Double amountRaised = fundRequestRepository.calculateTotalDonationsForRequest(fundRequest.getId());
+        dto.setAmountRaised(amountRaised);
 
         // Add user information
         dto.setUser(new UserProfileDTO(

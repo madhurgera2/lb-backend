@@ -48,13 +48,14 @@ public class FundRequestController {
 
     @GetMapping("/list")
     public ResponseEntity<?> listFundRequests(
+        @RequestParam(required = false) Long id,
         @RequestParam(required = false) Long userId,
         @RequestParam(required = false) String status,
         @RequestParam(required = false) Double minAmount,
         @RequestParam(required = false) Double maxAmount
     ) {
         try {
-            List<FundRequestDTO> requests = fundRequestService.searchFundRequests(userId, status, minAmount, maxAmount);
+            List<FundRequestDTO> requests = fundRequestService.searchFundRequests(id, userId, status, minAmount, maxAmount);
             return ResponseEntity.ok(requests);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

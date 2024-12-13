@@ -14,4 +14,7 @@ import java.util.List;
 public interface FundRequestRepository extends JpaRepository<FundRequest, Long>, JpaSpecificationExecutor<FundRequest> {
     @Query("SELECT fr FROM FundRequest fr WHERE fr.user.id = :userId")
     List<FundRequest> findByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT COALESCE(SUM(fd.amount), 0) FROM FundDonation fd WHERE fd.fundRequest.id = :fundRequestId AND fd.status = 'SUCCESS'")
+    Double calculateTotalDonationsForRequest(@Param("fundRequestId") Long fundRequestId);
 }
