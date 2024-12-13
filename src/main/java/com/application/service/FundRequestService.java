@@ -2,6 +2,8 @@ package com.application.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.application.dto.FundRequestDTO;
 import com.application.dto.UserProfileDTO;
@@ -9,6 +11,7 @@ import com.application.model.FundRequest;
 import com.application.model.User;
 import com.application.repository.FundRequestRepository;
 import com.application.repository.UserRepository;
+import com.application.specification.FundRequestSpecification;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +23,24 @@ public class FundRequestService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Transactional(readOnly = true)
+    public List<FundRequestDTO> searchFundRequests(
+        Long userId, 
+        String status, 
+        Double minAmount, 
+        Double maxAmount
+    ) {
+        // Create specification based on filters
+        Specification<FundRequest> spec = FundRequestSpecification.filterFundRequests(
+            userId, status, minAmount, maxAmount
+        );
+
+        // Find fund requests matching the specification and map to DTO
+        return fundRequestRepository.findAll(spec).stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
+    }
 
     public FundRequest createFundRequest(FundRequest fundRequest, Long userId, Long doctorId) {
         // Fetch user
@@ -57,6 +78,7 @@ public class FundRequestService {
         dto.setId(fundRequest.getId());
         dto.setAmount(fundRequest.getAmount());
         dto.setPatientName(fundRequest.getPatientName());
+        dto.setStatus(fundRequest.getStatus());
         dto.setCreatedAt(fundRequest.getCreatedAt());
 
         // Add user information

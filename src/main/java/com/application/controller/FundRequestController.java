@@ -48,16 +48,14 @@ public class FundRequestController {
 
     @GetMapping("/list")
     public ResponseEntity<?> listFundRequests(
-        @RequestParam(required = false) Long userId
+        @RequestParam(required = false) Long userId,
+        @RequestParam(required = false) String status,
+        @RequestParam(required = false) Double minAmount,
+        @RequestParam(required = false) Double maxAmount
     ) {
         try {
-            if (userId != null) {
-                List<FundRequestDTO> requests = fundRequestService.getFundRequestsByUserId(userId);
-                return ResponseEntity.ok(requests);
-            } else {
-                // If no user_id is provided, you might want to return all requests or return an error
-                return ResponseEntity.badRequest().body("User ID is required");
-            }
+            List<FundRequestDTO> requests = fundRequestService.searchFundRequests(userId, status, minAmount, maxAmount);
+            return ResponseEntity.ok(requests);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
