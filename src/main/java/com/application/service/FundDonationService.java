@@ -45,7 +45,12 @@ public class FundDonationService {
         fundDonation.setUser(user);
         fundDonation.setAmount(amount);
 
-        return fundDonationRepository.save(fundDonation);
+        FundDonation savedDonation = fundDonationRepository.save(fundDonation);
+
+        // Check if the fund request needs status update
+        checkAndUpdateFundRequestStatus(fundDonation.getFundRequest());
+
+        return savedDonation;
     }
 
     @Transactional(readOnly = true)
@@ -75,5 +80,16 @@ public class FundDonationService {
         dto.setUser(new UserProfileDTO(fundDonation.getUser()));
 
         return dto;
+    }
+
+    private void checkAndUpdateFundRequestStatus(FundRequest fundRequest) {
+        // Calculate total donations for this fund request
+        Double totalDonations = fundRequestRepository.calculateTotalDonationsForRequest(fundRequest.getId());
+
+        // Check if total donations meet or exceed the requested amount
+        if (totalDonations >= fundRequest.getAmount()) {
+            fundRequest.setStatus("COMPLETED");
+            fundRequestRepository.save(fundRequest);
+        }
     }
 }
