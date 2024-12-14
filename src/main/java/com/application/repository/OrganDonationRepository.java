@@ -16,4 +16,9 @@ public interface OrganDonationRepository extends
     
     @Query("SELECT od FROM OrganDonation od WHERE od.user.id = :userId")
     List<OrganDonation> findByUserId(@Param("userId") Long userId);
+
+    List<OrganDonation> findByOrganTypeAndStatusOrderByCreatedAtAsc(
+        String organType, 
+        String status
+    );
 }

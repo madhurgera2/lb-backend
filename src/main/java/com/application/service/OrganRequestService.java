@@ -9,8 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import com.application.dto.OrganRequestDTO;
+import com.application.model.OrganDonation;
 import com.application.model.OrganRequest;
 import com.application.model.User;
+import com.application.repository.OrganDonationRepository;
 import com.application.repository.OrganRequestRepository;
 import com.application.repository.UserRepository;
 import com.application.specification.OrganRequestSpecification;
@@ -28,6 +30,9 @@ public class OrganRequestService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private OrganDonationRepository organDonationRepository;
 
     @Transactional
     public OrganRequestDTO createOrganRequest(OrganRequest organRequest, Long userId, Long doctorId) {
@@ -121,6 +126,35 @@ public class OrganRequestService {
                 logger.warn("Approved units exceed requested units. Requested: {}, Approved: {}", 
                     organRequest.getUnits(), approvedUnits);
                 throw new IllegalArgumentException("Approved units cannot exceed requested units");
+            }
+
+            // Find the oldest approved organ donation of the same type
+            List<OrganDonation> availableDonations = organDonationRepository.findByOrganTypeAndStatusOrderByCreatedAtAsc(
+                organRequest.getOrganType(), 
+                "APPROVED"
+            );
+
+            // Check if enough donations are available
+            double totalAvailableDonations = availableDonations.stream()
+                .mapToDouble(OrganDonation::getUnits)
+                .sum();
+
+            if (totalAvailableDonations < approvedUnits) {
+                logger.warn("Insufficient organ donations. Available: {}, Requested: {}", 
+                    totalAvailableDonations, approvedUnits);
+                throw new IllegalStateException("Not enough organ donations available");
+            }
+
+            // Mark donations as used
+            double remainingUnitsToUse = approvedUnits;
+            for (OrganDonation donation : availableDonations) {
+                if (remainingUnitsToUse <= 0) break;
+
+                double unitsToUse = Math.min(donation.getUnits(), remainingUnitsToUse);
+                donation.setStatus("USED");
+                organDonationRepository.save(donation);
+
+                remainingUnitsToUse -= unitsToUse;
             }
 
             // Update organ request status
