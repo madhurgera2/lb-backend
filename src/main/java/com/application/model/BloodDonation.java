@@ -1,6 +1,7 @@
 package com.application.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import javax.persistence.Column;
@@ -55,5 +56,5 @@ public class BloodDonation {
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 }
