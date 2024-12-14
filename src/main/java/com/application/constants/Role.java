@@ -5,7 +5,8 @@ public enum Role {
     VOLUNTEER("volunteer"),
     ADMIN("admin"),
     SUPER_ADMIN("superAdmin"),
-    DOCTOR("doctor");
+    DOCTOR("doctor"),
+    DEAN("dean");
 
     private final String role;
 
