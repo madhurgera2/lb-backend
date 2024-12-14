@@ -60,13 +60,8 @@ public class BloodRequestController {
         @RequestParam(required = false) Long userId
     ) {
         try {
-            if (userId != null) {
-                List<BloodRequestDTO> requests = bloodRequestService.getBloodRequestsByUserId(userId);
+                List<BloodRequestDTO> requests = bloodRequestService.listBloodRequests(userId);
                 return ResponseEntity.ok(requests);
-            } else {
-                // If no user_id is provided, you might want to return all requests or return an error
-                return ResponseEntity.badRequest().body("User ID is required");
-            }
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -93,6 +88,28 @@ public class BloodRequestController {
             );
 
             return ResponseEntity.ok(approvedRequest);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/reject/{bloodRequestId}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<?> rejectBloodRequest(
+        @PathVariable Long bloodRequestId,
+        @RequestBody(required = false) Map<String, Object> requestBody
+    ) {
+        try {
+            // Get current admin ID
+            Long adminId = currentUserUtil.getCurrentUserId();
+
+            // Reject blood request
+            BloodRequestDTO rejectedRequest = bloodRequestService.rejectBloodRequest(
+                bloodRequestId, 
+                adminId
+            );
+
+            return ResponseEntity.ok(rejectedRequest);
         } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

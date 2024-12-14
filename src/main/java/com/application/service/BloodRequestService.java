@@ -1,17 +1,21 @@
 package com.application.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.application.dto.BloodDonationDTO;
 import com.application.dto.BloodRequestDTO;
 import com.application.dto.UserProfileDTO;
 import com.application.model.BloodBank;
+import com.application.model.BloodDonation;
 import com.application.model.BloodRequest;
 import com.application.model.User;
 import com.application.repository.BloodBankRepository;
 import com.application.repository.BloodRequestRepository;
 import com.application.repository.UserRepository;
+import com.application.specification.BloodRequestSpecification;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -108,6 +112,39 @@ public class BloodRequestService {
         return new BloodRequestDTO(updatedRequest);
     }
 
+    @Transactional
+    public BloodRequestDTO rejectBloodRequest(
+        Long bloodRequestId, 
+        Long adminId
+    ) {
+        // Fetch the blood request
+        BloodRequest bloodRequest = bloodRequestRepository.findById(bloodRequestId)
+            .orElseThrow(() -> new IllegalArgumentException("Blood Request not found"));
+
+        // Validate request status
+        if ("APPROVED".equals(bloodRequest.getStatus()) || 
+            "REJECTED".equals(bloodRequest.getStatus())) {
+            throw new IllegalStateException("Blood Request cannot be processed as it is already " + bloodRequest.getStatus());
+        }
+
+        // Fetch admin user
+        User admin = userRepository.findById(adminId);
+        if (admin == null) {
+            throw new IllegalArgumentException("Admin not found");
+        }
+
+        // Update blood request status
+        bloodRequest.setStatus("REJECTED");
+        bloodRequest.setProcessedBy(admin);
+        bloodRequest.setProcessedAt(LocalDateTime.now());
+
+        // Save the updated blood request
+        BloodRequest updatedRequest = bloodRequestRepository.save(bloodRequest);
+
+        // Convert and return the updated request
+        return new BloodRequestDTO(updatedRequest);
+    }
+
     public List<BloodRequestDTO> getBloodRequestsByUserId(Long userId) {
         // Verify user exists
         User user = userRepository.findById(userId);
@@ -120,6 +157,21 @@ public class BloodRequestService {
             .map(this::convertToDTO)
             .collect(Collectors.toList());
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<BloodRequestDTO> listBloodRequests(
+        Long userId
+    ) {
+        // Create specification based on filters
+        Specification<BloodRequest> spec = BloodRequestSpecification.filterBloodRequests(
+            userId
+        );
+
+        // Find blood requests matching the specification and map to DTO
+        return bloodRequestRepository.findAll(spec).stream()
+            .map(this::convertToDTO)
+            .collect(Collectors.toList());
     }
 
     private BloodRequestDTO convertToDTO(BloodRequest bloodRequest) {
