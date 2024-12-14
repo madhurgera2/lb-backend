@@ -68,4 +68,14 @@ public class BloodRequest {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "approved_units")
+    private Double approvedUnits;
+
+    @ManyToOne
+    @JoinColumn(name = "processed_by_id")
+    private User processedBy;
+
+    @Column(name = "processed_at")
+    private LocalDateTime processedAt;
 }

@@ -1,6 +1,7 @@
 package com.application.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import javax.persistence.Column;
@@ -50,10 +51,13 @@ public class BloodBank {
     @Column(name = "approved_units")
     private Double approvedUnits;
 
+    @Column(name = "blood_group")
+    private String bloodGroup;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "approved_at")
-    private LocalDate approvedAt;
+    private LocalDateTime approvedAt;
 }

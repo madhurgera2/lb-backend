@@ -1,6 +1,7 @@
 package com.application.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,9 +62,10 @@ public class BloodDonationService {
         BloodBank bloodBankEntry = new BloodBank();
         bloodBankEntry.setBloodDonation(bloodDonation);
         bloodBankEntry.setAdmin(admin);
-        bloodBankEntry.setStatus("COMPLETED");
+        bloodBankEntry.setStatus("USABLE");
         bloodBankEntry.setApprovedUnits(1.0); // Each entry is a single unit
-        bloodBankEntry.setApprovedAt(LocalDate.now());
+        bloodBankEntry.setApprovedAt(LocalDateTime.now());
+        bloodBankEntry.setBloodGroup(bloodDonation.getUser().getBloodgroup());
         
         bloodBankEntries.add(bloodBankRepository.save(bloodBankEntry));
     }

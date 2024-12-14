@@ -19,6 +19,7 @@ public class BloodRequestDTO {
     private String patientName;
     private LocalDateTime requireBefore;
     private String status;
+    private Double approvedUnits;
     private LocalDateTime createdAt;
     private UserProfileDTO user;
     private UserProfileDTO doctor;
@@ -32,30 +33,11 @@ public class BloodRequestDTO {
         this.bloodGroup = bloodRequest.getBloodGroup();
         this.patientName = bloodRequest.getPatientName();
         this.requireBefore = bloodRequest.getRequireBefore();
+        this.approvedUnits = bloodRequest.getApprovedUnits();
         this.status = bloodRequest.getStatus();
         this.createdAt = bloodRequest.getCreatedAt();
         this.user = new UserProfileDTO(bloodRequest.getUser());
         this.doctor = new UserProfileDTO(bloodRequest.getDoctor());
     }
 
-        private BloodRequestDTO convertToDTO(BloodRequest bloodRequest) {
-        BloodRequestDTO dto = new BloodRequestDTO();
-        dto.setId(bloodRequest.getId());
-        dto.setUnits(bloodRequest.getUnits());
-        dto.setBloodGroup(bloodRequest.getBloodGroup());
-        dto.setPatientName(bloodRequest.getPatientName());
-        dto.setRequireBefore(bloodRequest.getRequireBefore());
-        dto.setStatus(bloodRequest.getStatus());
-        dto.setCreatedAt(bloodRequest.getCreatedAt());
-
-        // Add user information
-        dto.setUser(new UserProfileDTO(
-            bloodRequest.getUser()));
-
-        // Add doctor information
-        dto.setDoctor(new UserProfileDTO(
-            bloodRequest.getDoctor()));
-
-        return dto;
-    }
 }
