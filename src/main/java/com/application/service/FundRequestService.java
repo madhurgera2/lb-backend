@@ -43,6 +43,60 @@ public class FundRequestService {
             .collect(Collectors.toList());
     }
 
+    @Transactional
+    public FundRequestDTO approveFundRequest(Long fundRequestId) {
+        // Find the fund request
+        FundRequest fundRequest = fundRequestRepository.findById(fundRequestId)
+            .orElseThrow(() -> new IllegalArgumentException("Fund request not found"));
+
+        // Check if the request is already approved
+        if ("APPROVED".equals(fundRequest.getStatus())) {
+            throw new IllegalStateException("Fund request is already approved");
+        }
+
+        if ("REJECTED".equals(fundRequest.getStatus())) {
+            throw new IllegalStateException("Fund request is already rejected");
+        }
+
+        if ("COMPLETED".equals(fundRequest.getStatus())) {
+            throw new IllegalStateException("Fund request is already completed");
+        }
+
+        // Update status to APPROVED
+        fundRequest.setStatus("APPROVED");
+        FundRequest updatedRequest = fundRequestRepository.save(fundRequest);
+
+        // Convert and return the updated request
+        return convertToDTO(updatedRequest);
+    }
+
+    @Transactional
+    public FundRequestDTO rejectFundRequest(Long fundRequestId) {
+        // Find the fund request
+        FundRequest fundRequest = fundRequestRepository.findById(fundRequestId)
+            .orElseThrow(() -> new IllegalArgumentException("Fund request not found"));
+
+        // Check if the request is already approved
+        if ("APPROVED".equals(fundRequest.getStatus())) {
+            throw new IllegalStateException("Fund request is already approved");
+        }
+
+        if ("REJECTED".equals(fundRequest.getStatus())) {
+            throw new IllegalStateException("Fund request is already rejected");
+        }
+
+        if ("COMPLETED".equals(fundRequest.getStatus())) {
+            throw new IllegalStateException("Fund request is already completed");
+        }
+
+        // Update status to REJECTED
+        fundRequest.setStatus("REJECTED");
+        FundRequest updatedRequest = fundRequestRepository.save(fundRequest);
+
+        // Convert and return the updated request
+        return convertToDTO(updatedRequest);
+    }
+
     public FundRequest createFundRequest(FundRequest fundRequest, Long userId, Long doctorId) {
         // Fetch user
         User user = userRepository.findById(userId);

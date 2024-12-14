@@ -63,11 +63,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
             try {
                 // Check if token belongs to Admin or User
-                if (jwtUtil.isAdminToken(token)) {
-                    userDetails = adminService.loadAdminByEmail(userEmail);
-                } else {
+                // if (jwtUtil.isAdminToken(token)) {
+                //     userDetails = adminService.loadAdminByEmail(userEmail);
+                // } else {
                     userDetails = userService.loadUserByEmail(userEmail);
-                }
+                // }
 
                 // Validate token
                 if (jwtUtil.validateToken(token, userDetails)) {

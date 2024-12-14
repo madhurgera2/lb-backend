@@ -2,8 +2,11 @@ package com.application.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,6 +61,32 @@ public class FundRequestController {
             List<FundRequestDTO> requests = fundRequestService.searchFundRequests(id, userId, status, minAmount, maxAmount);
             return ResponseEntity.ok(requests);
         } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/approve/{fundRequestId}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<?> approveFundRequest(
+        @PathVariable Long fundRequestId
+    ) {
+        try {
+            FundRequestDTO approvedRequest = fundRequestService.approveFundRequest(fundRequestId);
+            return ResponseEntity.ok(approvedRequest);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PutMapping("/reject/{fundRequestId}")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<?> rejectFundRequest(
+        @PathVariable Long fundRequestId
+    ) {
+        try {
+            FundRequestDTO rejectedRequest = fundRequestService.rejectFundRequest(fundRequestId);
+            return ResponseEntity.ok(rejectedRequest);
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

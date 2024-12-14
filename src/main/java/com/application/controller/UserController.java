@@ -83,6 +83,26 @@ public class UserController {
 		return ResponseEntity.ok(new JwtResponse(token, authenticatedUser.getEmail()));
 	}
 
+	@PostMapping("/loginAdmin")
+	public ResponseEntity<?> loginAdmin(@RequestBody User user) {
+		if (user.getEmail() == null || user.getPassword() == null) {
+			throw new IllegalArgumentException("Email and password are required.");
+		}
+
+		User authenticatedUser = userService.fetchUserByEmail(user.getEmail());
+		if (authenticatedUser == null
+				|| !passwordEncoder.matches(user.getPassword(), authenticatedUser.getPassword())) {
+			throw new InvalidCredentialsException("Invalid credentials");
+		}
+
+		if (!authenticatedUser.getRole().equals(Role.ADMIN.getRole())) {
+			throw new InvalidCredentialsException("User not authorized for admin login");
+		}
+
+		String token = jwtUtil.generateToken(authenticatedUser.getEmail(), authenticatedUser.getRole());
+		return ResponseEntity.ok(new JwtResponse(token, authenticatedUser.getEmail()));
+	}
+
 	@PostMapping("/register")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody User user) {
 		if (user.getEmail() == null || user.getEmail().isEmpty()) {

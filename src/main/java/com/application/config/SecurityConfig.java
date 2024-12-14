@@ -76,7 +76,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/volunteers/register", 
                 "/admin/login", 
                 "/admin/register", 
-                "/api/user/login", 
+                "/api/user/login",
+                "/api/user/loginAdmin", 
                 "/user/register",
                 "/api/user/register" 
             ).permitAll()
